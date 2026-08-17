@@ -7,7 +7,7 @@ from app.api import health, photos
 from app.db import Base, SessionLocal, engine
 from app.migrate import ensure_blob_columns
 from app.models.photo import PhotoModel  # noqa: F401 — register model with Base
-from app.seed import seed_if_empty
+from app.seed import seed_photos
 
 
 @asynccontextmanager
@@ -16,7 +16,7 @@ async def lifespan(_app: FastAPI):
     ensure_blob_columns()
     db = SessionLocal()
     try:
-        seed_if_empty(db)
+        seed_photos(db)
     finally:
         db.close()
     yield

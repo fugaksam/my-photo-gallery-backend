@@ -33,7 +33,7 @@ uvicorn app.main:app --reload --port 8000
 - API: http://localhost:8000
 - Health: http://localhost:8000/health
 - Swagger: http://localhost:8000/docs
-- DB ファイル: `data/app.db`（初回起動時に作成・シード）
+- DB ファイル: `data/app.db`（初回起動時に作成。初期猫画像は `seed_images/` から BLOB 投入）
 
 ## エンドポイント
 
@@ -69,12 +69,13 @@ CORS は `http://localhost:3000` を許可済みです。
 ## ディレクトリ構成
 
 ```
+seed_images/            # 初期表示用 JPEG（起動時に BLOB へ投入）
 data/
 └── app.db              # SQLite（gitignore）
 app/
 ├── main.py             # FastAPI / CORS / lifespan
 ├── db.py               # engine, Session, get_db
-├── seed.py             # 初期データ投入
+├── seed.py             # 初期画像を BLOB として投入
 ├── models/
 │   └── photo.py        # PhotoModel
 ├── api/
@@ -94,5 +95,5 @@ app/
 ```bash
 curl http://localhost:8000/health
 curl http://localhost:8000/api/photos
-sqlite3 data/app.db "SELECT id, title FROM photos;"
+sqlite3 data/app.db "SELECT id, title, length(image), content_type FROM photos;"
 ```
