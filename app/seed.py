@@ -56,8 +56,11 @@ def seed_photos(db: Session) -> None:
 
     changed = False
     for photo in SEED_PHOTOS:
-        image = _read_seed_image(photo["filename"])
         row = by_src.get(photo["legacy_src"]) or by_title.get(photo["title"])
+        if row is not None and row.image is not None:
+            continue
+
+        image = _read_seed_image(photo["filename"])
         if row is None:
             db.add(
                 PhotoModel(
@@ -68,13 +71,11 @@ def seed_photos(db: Session) -> None:
                     content_type="image/jpeg",
                 )
             )
-            changed = True
-            continue
-        if row.image is None:
+        else:
             row.image = image
             row.content_type = "image/jpeg"
             row.src = ""
-            changed = True
+        changed = True
 
     if changed:
         db.commit()
