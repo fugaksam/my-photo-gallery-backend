@@ -11,11 +11,8 @@ router = APIRouter(prefix="/api/photos", tags=["photos"])
 
 
 def _to_photo(row: PhotoModel, request: Request) -> Photo:
-    if row.image is not None:
-        base = str(request.base_url).rstrip("/")
-        src = f"{base}/api/photos/{row.id}/image"
-    else:
-        src = row.src
+    base = str(request.base_url).rstrip("/")
+    src = f"{base}/api/photos/{row.id}/image"
     return Photo(id=row.id, src=src, title=row.title, date=row.date)
 
 
@@ -60,7 +57,6 @@ async def post_photo(
         raise HTTPException(status_code=400, detail="empty file")
 
     row = PhotoModel(
-        src="",
         title=title.strip(),
         date=date.strip(),
         image=data,

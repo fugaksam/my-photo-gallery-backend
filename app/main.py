@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import health, photos
 from app.db import Base, SessionLocal, engine
-from app.migrate import ensure_blob_columns
+from app.migrate import migrate_photos_schema
 from app.models.photo import PhotoModel  # noqa: F401 — register model with Base
 from app.seed import seed_photos
 
@@ -13,7 +13,7 @@ from app.seed import seed_photos
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    ensure_blob_columns()
+    migrate_photos_schema()
     db = SessionLocal()
     try:
         seed_photos(db)

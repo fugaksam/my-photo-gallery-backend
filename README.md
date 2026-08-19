@@ -2,7 +2,7 @@
 
 `my-photo-gallery`（Next.js FE）用の Python API です。
 
-写真メタデータと画像本体（学習用 **SQLite BLOB**）を SQLAlchemy で永続化します（`data/app.db`）。S3 は未導入です。
+写真メタデータと画像本体を SQLite BLOB として SQLAlchemy で永続化します（`data/app.db`）。
 
 FE リポジトリ: 別リポ `my-photo-gallery`（`NEXT_PUBLIC_API_BASE_URL` でこの API を向ける）
 
@@ -54,7 +54,7 @@ curl -X POST http://localhost:8000/api/photos \
   -F "file=@./sample.jpg"
 ```
 
-アップロード後の `src` は `http://localhost:8000/api/photos/{id}/image` になります。
+JSON の `src` は DB 列ではなく、画像配信 URL（`http://localhost:8000/api/photos/{id}/image`）です。
 
 ## FE 側の接続
 
@@ -88,7 +88,7 @@ app/
 ## スコープ
 
 - 対応: health / photos list・get・create、画像 BLOB 保存・配信、CORS、SQLite 永続化
-- 未対応: S3、認証、一時クレデンシャル発行、Alembic
+- 未対応: 認証、Alembic
 
 ## ローカル確認
 
