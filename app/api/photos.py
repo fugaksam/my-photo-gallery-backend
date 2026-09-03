@@ -66,3 +66,12 @@ async def post_photo(
     db.commit()
     db.refresh(row)
     return _to_photo(row, request)
+
+
+@router.delete("/{photo_id}", status_code=204)
+def delete_photo(photo_id: int, db: Session = Depends(get_db)) -> None:
+    row = db.get(PhotoModel, photo_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Photo not found")
+    db.delete(row)
+    db.commit()

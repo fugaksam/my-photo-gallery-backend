@@ -44,6 +44,7 @@ uvicorn app.main:app --reload --port 8000
 | GET | `/api/photos/{id}` | 写真詳細（なければ 404） |
 | GET | `/api/photos/{id}/image` | 画像本体（BLOB） |
 | POST | `/api/photos` | 写真登録（`multipart/form-data`: title, date, file） |
+| DELETE | `/api/photos/{id}` | 写真削除（なければ 404） |
 
 ### POST 例（multipart）
 
@@ -87,7 +88,7 @@ app/
 
 ## スコープ
 
-- 対応: health / photos list・get・create、画像 BLOB 保存・配信、CORS、SQLite 永続化
+- 対応: health / photos list・get・create・delete、画像 BLOB 保存・配信、CORS、SQLite 永続化
 - 未対応: 認証、Alembic
 
 ## ローカル確認
