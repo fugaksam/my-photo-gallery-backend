@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models.photo import PhotoModel
-from app.schemas.photo import Photo
+from app.schemas.photo import Photo, PhotoUpdate
 
 router = APIRouter(prefix="/api/photos", tags=["photos"])
 
@@ -13,7 +13,13 @@ router = APIRouter(prefix="/api/photos", tags=["photos"])
 def _to_photo(row: PhotoModel, request: Request) -> Photo:
     base = str(request.base_url).rstrip("/")
     src = f"{base}/api/photos/{row.id}/image"
-    return Photo(id=row.id, src=src, title=row.title, date=row.date)
+    return Photo(
+        id=row.id,
+        src=src,
+        title=row.title,
+        date=row.date,
+        description=row.description or "",
+    )
 
 
 @router.get("", response_model=list[Photo])
@@ -59,10 +65,33 @@ async def post_photo(
     row = PhotoModel(
         title=title.strip(),
         date=date.strip(),
+        description="",
         image=data,
         content_type=file.content_type,
     )
     db.add(row)
+    db.commit()
+    db.refresh(row)
+    return _to_photo(row, request)
+
+
+@router.patch("/{photo_id}", response_model=Photo)
+def patch_photo(
+    photo_id: int,
+    body: PhotoUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> Photo:
+    row = db.get(PhotoModel, photo_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Photo not found")
+
+    title = body.title.strip()
+    if not title:
+        raise HTTPException(status_code=400, detail="title is required")
+
+    row.title = title
+    row.description = body.description.strip()
     db.commit()
     db.refresh(row)
     return _to_photo(row, request)

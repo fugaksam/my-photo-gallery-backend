@@ -60,6 +60,7 @@ def seed_photos(db: Session) -> None:
                 PhotoModel(
                     title=photo["title"],
                     date=photo["date"],
+                    description="",
                     image=image,
                     content_type="image/jpeg",
                 )

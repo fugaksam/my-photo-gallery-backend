@@ -10,6 +10,7 @@ class PhotoModel(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
     date: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=False, default="")
     # 画像本体を SQLite BLOB で保持する
     image: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     content_type: Mapped[str | None] = mapped_column(String, nullable=True)

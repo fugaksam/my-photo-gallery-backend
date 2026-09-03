@@ -14,5 +14,9 @@ def migrate_photos_schema() -> None:
             conn.execute(text("ALTER TABLE photos ADD COLUMN image BLOB"))
         if "content_type" not in names:
             conn.execute(text("ALTER TABLE photos ADD COLUMN content_type VARCHAR"))
+        if "description" not in names:
+            conn.execute(
+                text("ALTER TABLE photos ADD COLUMN description VARCHAR NOT NULL DEFAULT ''")
+            )
         if "src" in names:
             conn.execute(text("ALTER TABLE photos DROP COLUMN src"))

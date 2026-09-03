@@ -44,6 +44,7 @@ uvicorn app.main:app --reload --port 8000
 | GET | `/api/photos/{id}` | 写真詳細（なければ 404） |
 | GET | `/api/photos/{id}/image` | 画像本体（BLOB） |
 | POST | `/api/photos` | 写真登録（`multipart/form-data`: title, date, file） |
+| PATCH | `/api/photos/{id}` | タイトル・説明文の更新（JSON） |
 | DELETE | `/api/photos/{id}` | 写真削除（なければ 404） |
 
 ### POST 例（multipart）
@@ -55,7 +56,15 @@ curl -X POST http://localhost:8000/api/photos \
   -F "file=@./sample.jpg"
 ```
 
-JSON の `src` は DB 列ではなく、画像配信 URL（`http://localhost:8000/api/photos/{id}/image`）です。
+### PATCH 例（JSON）
+
+```bash
+curl -X PATCH http://localhost:8000/api/photos/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title":"新しいタイトル","description":"説明文です"}'
+```
+
+JSON の `src` は DB 列ではなく、画像配信 URL（`http://localhost:8000/api/photos/{id}/image`）です。`description` は空文字可です。
 
 ## FE 側の接続
 
@@ -88,7 +97,7 @@ app/
 
 ## スコープ
 
-- 対応: health / photos list・get・create・delete、画像 BLOB 保存・配信、CORS、SQLite 永続化
+- 対応: health / photos list・get・create・update・delete、画像 BLOB 保存・配信、CORS、SQLite 永続化
 - 未対応: 認証、Alembic
 
 ## ローカル確認
@@ -96,5 +105,5 @@ app/
 ```bash
 curl http://localhost:8000/health
 curl http://localhost:8000/api/photos
-sqlite3 data/app.db "SELECT id, title, length(image), content_type FROM photos;"
+sqlite3 data/app.db "SELECT id, title, description, length(image), content_type FROM photos;"
 ```
