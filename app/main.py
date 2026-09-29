@@ -3,9 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import health, photos
+from app.api import albums, health, photos
 from app.db import Base, SessionLocal, engine
 from app.migrate import migrate_photos_schema
+from app.models.album import AlbumModel, AlbumPhotoModel  # noqa: F401 — register models
 from app.models.photo import PhotoModel  # noqa: F401 — register model with Base
 from app.seed import seed_photos
 
@@ -24,7 +25,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(
     title="my-photo-gallery API",
-    version="0.3.0",
+    version="0.4.0",
     description="Photo gallery backend (SQLite BLOB + SQLAlchemy).",
     lifespan=lifespan,
 )
@@ -42,3 +43,4 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(photos.router)
+app.include_router(albums.router)

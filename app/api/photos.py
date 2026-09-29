@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.models.album import AlbumPhotoModel
 from app.models.photo import PhotoModel
 from app.schemas.photo import Photo, PhotoUpdate
 
@@ -102,5 +103,10 @@ def delete_photo(photo_id: int, db: Session = Depends(get_db)) -> None:
     row = db.get(PhotoModel, photo_id)
     if row is None:
         raise HTTPException(status_code=404, detail="Photo not found")
+    links = db.scalars(
+        select(AlbumPhotoModel).where(AlbumPhotoModel.photo_id == photo_id)
+    ).all()
+    for link in links:
+        db.delete(link)
     db.delete(row)
     db.commit()

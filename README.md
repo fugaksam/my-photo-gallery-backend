@@ -46,6 +46,11 @@ uvicorn app.main:app --reload --port 8000
 | POST | `/api/photos` | 写真登録（`multipart/form-data`: title, date, file） |
 | PATCH | `/api/photos/{id}` | タイトル・説明文の更新（JSON） |
 | DELETE | `/api/photos/{id}` | 写真削除（なければ 404） |
+| GET | `/api/albums` | アルバム一覧（先頭写真をサムネイルに使用） |
+| GET | `/api/albums/{id}` | アルバム詳細（写真一覧付き） |
+| POST | `/api/albums` | アルバム作成（JSON: name?, photo_ids） |
+| PATCH | `/api/albums/{id}` | アルバム名 / 写真構成の更新（JSON） |
+| DELETE | `/api/albums/{id}` | アルバム削除 |
 
 ### POST 例（multipart）
 
@@ -65,6 +70,25 @@ curl -X PATCH http://localhost:8000/api/photos/1 \
 ```
 
 JSON の `src` は DB 列ではなく、画像配信 URL（`http://localhost:8000/api/photos/{id}/image`）です。`description` は空文字可です。
+
+### アルバム作成例（JSON）
+
+```bash
+curl -X POST http://localhost:8000/api/albums \
+  -H "Content-Type: application/json" \
+  -d '{"photo_ids":[1,2,3]}'
+```
+
+`name` を省略（または空）すると、重複しない `アルバム1`, `アルバム2`, ... が自動採番されます。
+サムネイルは `photo_ids` の先頭写真です。
+
+### アルバム名更新例
+
+```bash
+curl -X PATCH http://localhost:8000/api/albums/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"お気に入り猫"}'
+```
 
 ## FE 側の接続
 
@@ -87,17 +111,20 @@ app/
 ├── db.py               # engine, Session, get_db
 ├── seed.py             # 初期画像を BLOB として投入
 ├── models/
-│   └── photo.py        # PhotoModel
+│   ├── photo.py        # PhotoModel
+│   └── album.py        # AlbumModel / AlbumPhotoModel
 ├── api/
 │   ├── health.py
-│   └── photos.py
+│   ├── photos.py
+│   └── albums.py
 └── schemas/
-    └── photo.py        # Pydantic
+    ├── photo.py        # Pydantic
+    └── album.py
 ```
 
 ## スコープ
 
-- 対応: health / photos list・get・create・update・delete、画像 BLOB 保存・配信、CORS、SQLite 永続化
+- 対応: health / photos list・get・create・update・delete、albums CRUD、画像 BLOB 保存・配信、CORS、SQLite 永続化
 - 未対応: 認証、Alembic
 
 ## ローカル確認
